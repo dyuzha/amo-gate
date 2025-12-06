@@ -1,0 +1,26 @@
+services:
+
+  amo-gate:
+    build: .
+    container_name: amo-gate
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "9000:9000"
+
+    volumes:
+      - ./.tokens:/.tokens:rw
+      - ./.certs:/.certs:ro
+      - ./logs:/logs:rw
+
+    environment:
+      TZ: Europe/Moscow
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "7"

@@ -1,0 +1,7 @@
+.env
+.test.env
+__pycache__
+logs/
+.tokens/
+.certs/
+.pytest_cache
