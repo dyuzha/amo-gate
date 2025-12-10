@@ -45,6 +45,9 @@ def register_settings(root_path: Path):
         ssl_key: Path = certs_path / "cert.key"
         ssl_cert: Path = certs_path / "fullchain.cer"
         log_dir: Path = root_path / 'logs'
+        ssl_enabled: bool = False
+        port: int = 5000
+        host: str = "0.0.0.0"
 
     class Settings:
         app = AppSettings()

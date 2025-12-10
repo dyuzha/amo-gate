@@ -1,4 +1,5 @@
 import logging, sys, uvicorn, signal
+from typing import Any
 from pathlib import Path
 from gate.amo.amo_register import amo_register
 from gate.settings.config import register_settings
@@ -72,11 +73,19 @@ app.state.amo_client = amo_client
 logger.info("API успешно подключилось к менеджеру очереди.")
 
 
-if __name__ == "__main__":
-    uvicorn.run(
-            app,
-            host="0.0.0.0",
-            port=9000,
+
+uvicorn_settings: dict[str, Any] = dict(
+        app=app,
+        host=app_settings.host,
+        port=app_settings.port,
+        )
+
+
+if app_settings.ssl_enabled:
+    uvicorn_settings.update(
             ssl_keyfile=app_settings.ssl_key,
             ssl_certfile=app_settings.ssl_cert,
             )
+
+if __name__ == "__main__":
+    uvicorn.run(**uvicorn_settings)

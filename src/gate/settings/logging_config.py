@@ -83,7 +83,8 @@ def setup_logging(
         log_dir.mkdir(exist_ok=True)
 
         # Добавляем вывод в файл по текущей дате
-        log_file = log_dir / f'{datetime.now():%Y-%m-%d}.log'
+        # log_file = log_dir / f'{datetime.now():%Y-%m-%d}.log'
+        log_file = log_dir / f'rdesk2amo-gate.log'
 
         # file_handler = logging.FileHandler(log_file, encoding='utf-8')
         file_handler = TimedRotatingFileHandler(
