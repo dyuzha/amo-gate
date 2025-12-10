@@ -12,10 +12,10 @@ async def test_webhook_booked():
         payload = json.load(f)
 
     async with AsyncClient(
-        base_url="https://localhost:9000",
+        base_url="http://localhost:443",
         verify=False,
     ) as client:
-        response = await client.post("/booked", json=payload)
+        response = await client.post("/zdrav/booked", json=payload)
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}

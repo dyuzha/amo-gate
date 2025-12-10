@@ -9,7 +9,7 @@ services:
       - .env
 
     ports:
-      - "9000:9000"
+      - "5000:5001"
 
     volumes:
       - ./.tokens:/.tokens:rw
