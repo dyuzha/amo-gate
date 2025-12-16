@@ -1,6 +1,6 @@
 services:
 
-  amo-gate:
+  rdesk-amo-sync:
     build: .
     container_name: amo-gate
     restart: unless-stopped
