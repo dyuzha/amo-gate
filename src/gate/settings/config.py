@@ -61,7 +61,7 @@ def register_settings(root_path: Path):
     class BookedFieldMapping(ConfigBase):
         model_config = SettingsConfigDict(env_prefix='FIELD_BOOKED_')
 
-        status: int = 1304923
+        status: int = 1349841
         check_in: int = 1305059
         check_out: int = 1305061
         guests: int = 1304335

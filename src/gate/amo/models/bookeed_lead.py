@@ -27,7 +27,7 @@ def booked_lead_factory(
         c_paid_price = cf.NumericCustomField('', field_id=paid_price)
         c_zdrav_id = cf.NumericCustomField('', field_id=zdrav_id)
 
-        c_status = cf.SelectCustomField('', field_id=status)
+        c_status = cf.TextCustomField('', field_id=status)
         c_check_in = cf.DateCustomField('', field_id=check_in)
         c_check_out = cf.DateCustomField('', field_id=check_out)
         c_guests = cf.TextAreaCustomField('', field_id=guests)

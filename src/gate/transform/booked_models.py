@@ -3,22 +3,10 @@ from pydantic import BaseModel, Field, field_validator
 from typing import List, Literal, Optional
 
 
-STATUS_MAP = {
-    "booked": "Забронировано",
-    "checkin": "Проживает",
-    "checkout": "Выехал",
-    "cancel": "Отменено",
-    "waiting": "В ожидании"
-}
-
-
 class BillData(BaseModel):
     billNum: Optional[str] = None
     billSum: Optional[str] = None
     billPaidSum: Optional[str] = None
-    # billNum: str
-    # billSum: str
-    # billPaidSum: str
 
 
 class Money(BaseModel):
@@ -65,7 +53,7 @@ class ExtData(BaseModel):
 
 class Booking(BaseModel):
     status: Literal[
-            "Забронировано", "Проживает", "Выехал", "Отменено", "В ожидании"
+            "booked", "checkin", "checkout", "cancel", "waiting"
             ]
     bookedAt: datetime
     name: str
@@ -94,7 +82,3 @@ class Booking(BaseModel):
     @property
     def extDataText(self) -> str:
         return self.extData.guestsText
-
-    @field_validator("status", mode="before")
-    def map_status(cls, v):
-        return STATUS_MAP.get(v, v)
