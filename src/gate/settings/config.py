@@ -49,9 +49,31 @@ def register_settings(root_path: Path):
         port: int = 5000
         host: str = "0.0.0.0"
 
+
+    class SharedFieldMapping(ConfigBase):
+        model_config = SettingsConfigDict(env_prefix='FIELD_SHARED_')
+
+        created_at: int = 1287599
+        paid_price: int = 1305167
+        zdrav_id: int = 1305111
+
+
+    class BookedFieldMapping(ConfigBase):
+        model_config = SettingsConfigDict(env_prefix='FIELD_BOOKED_')
+
+        status: int = 1304923
+        check_in: int = 1305059
+        check_out: int = 1305061
+        guests: int = 1304335
+        doc_num: int = 1305107
+        bill_data: int = 1304929
+
+
     class Settings:
         app = AppSettings()
         mock_pipeline = MockPipelineSettings()
         amo = AmoSettings() # type: ignore[call-arg]
+        booked_fields = BookedFieldMapping()
+        shared_fields = SharedFieldMapping()
 
     return Settings

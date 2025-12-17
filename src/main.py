@@ -22,6 +22,9 @@ amo_settings = settings.amo
 app_settings = settings.app
 mock_pipeline_settings = settings.mock_pipeline
 
+booked_fields=settings.booked_fields
+shared_fields=settings.shared_fields
+
 # Настройка логирования
 setup_logging(level=logging.DEBUG, log_dir=app_settings.log_dir)
 
@@ -49,6 +52,8 @@ amo_client = amo_register(
         tokens_path=root_path / ".tokens",
         mocked_lead_id=args.mocked_lead_id,
         amo_settings=amo_settings,
+        shared_fields=shared_fields,
+        booked_fields=booked_fields,
         booked_id=mock_pipeline_settings.booked_id,
         booked_status_id=mock_pipeline_settings.booked_status_id,
         )

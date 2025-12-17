@@ -7,8 +7,8 @@ from typing import Optional
 
 
 NOISE_LOGGERS = [
-    "uvicorn",
-    "asyncio",
+    # "uvicorn",
+    # "asyncio",
     # "uvicorn.error",
     # "uvicorn.access",
     # "urllib3",
@@ -114,6 +114,7 @@ def setup_logging(
         datefmt="%Y-%m-%d %H:%M:%S"
     )
 
+    logging.getLogger("amocrm.v2").setLevel(logging.DEBUG)
     for ln in NOISE_LOGGERS:
         logging.getLogger(ln).setLevel(logging.CRITICAL)
         logging.getLogger(ln).propagate = False

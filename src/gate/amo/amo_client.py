@@ -3,12 +3,10 @@ from typing import Optional
 from amocrm.v2.tokens import TokenManager
 from amocrm.v2.exceptions import NoToken, NotFound
 from gate.amo.mocker_lead_id import MockerLeadID
-from gate.amo.models.bookeed_lead import BookedLead
 from gate.transform.booked_models import Booking
 
 
 logger = logging.getLogger(__name__)
-
 
 class AmoClient:
 
@@ -17,12 +15,14 @@ class AmoClient:
             manager: TokenManager,
             auth_code: Optional[str],
             *,
+            booked_lead_cls,
             mocked_lead_id: bool = False,
             mocker: Optional[MockerLeadID] = None,
             ):
         self._ensure_initialized(manager, auth_code)
         self.mocker = mocker
         self.mocked_lead_id = mocked_lead_id
+        self.BookedLead = booked_lead_cls
 
         if mocked_lead_id:
             logger.info('Амо клиент запущен в режиме подмены lead_id.')
@@ -55,7 +55,7 @@ class AmoClient:
 
         # Получаем lead_id
         try:
-            lead = BookedLead.objects.get(object_id=lead_id)
+            lead = self.BookedLead.objects.get(object_id=lead_id)
         except NotFound:
             logger.warning(f'Лид с lead_id: {lead_id} не найден.')
             return False

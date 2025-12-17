@@ -12,7 +12,8 @@ async def test_webhook_booked():
         payload = json.load(f)
 
     async with AsyncClient(
-        base_url="http://localhost:443",
+        # base_url="https://bir.amo-dev.it4prof.ru:9000",
+        base_url="https://localhost:9000",
         verify=False,
     ) as client:
         response = await client.post("/zdrav/booked", json=payload)

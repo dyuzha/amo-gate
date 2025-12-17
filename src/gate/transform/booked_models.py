@@ -52,12 +52,12 @@ class ExtData(BaseModel):
             return "\n".join(
                     f'{g.fio}\n'
                     f'Дата рождения: {g.birthday}\n'
-                    # f'Stay count: {g.stayCount}\n'
+                    f'Stay count: {g.stayCount}\n' #
                     f'Категория номера: {g.roomCategory}\n'
                     f'Возрастная группа: {g.ageGroup}\n'
                     f'Направление: {g.cure}\n'
-                    # f'UID: {g.uid}\n'
-                    # f'Счет №: {g.billNum}\n'
+                    f'UID: {g.uid}\n' #
+                    f'Счет №: {g.billNum}\n' #
                 for g in self.guests
             )
         return ''

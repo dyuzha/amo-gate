@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from amocrm.v2 import tokens
 from gate.amo.amo_client import AmoClient
+from gate.amo.amo_register import amo_register
 from gate.settings.config import register_settings
 
 # Настройка логирования для всех тестов
@@ -23,6 +24,9 @@ settings = register_settings(root_path)
 amo_settings = settings.amo
 app_settings = settings.app
 mock_pipeline_settings = settings.mock_pipeline
+booked_fields=settings.booked_fields
+shared_fields=settings.shared_fields
+
 
 @pytest.fixture(scope="session")
 def amo_settings_fixture():
@@ -46,4 +50,17 @@ def token_manager():
 @pytest.fixture(scope="session")
 def amo_client(token_manager, amo_settings_fixture):
     """Создаёт AmoClient с реальной авторизацией."""
-    return AmoClient(token_manager, amo_settings_fixture.auth_code)
+    # return AmoClient(
+    #         token_manager,
+    #         amo_settings_fixture.auth_code,
+    #         # booked_lead_cls=
+    #         )
+    return amo_register(
+        tokens_path=tokens_path,
+        mocked_lead_id=False,
+        amo_settings=amo_settings,
+        shared_fields=shared_fields,
+        booked_fields=booked_fields,
+        booked_id=mock_pipeline_settings.booked_id,
+        booked_status_id=mock_pipeline_settings.booked_status_id,
+        )
