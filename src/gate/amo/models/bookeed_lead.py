@@ -25,7 +25,7 @@ def booked_lead_factory(
     class BookedLead(CustomLead):
         c_created_at = cf.DateTimeCustomField('', field_id=created_at)
         c_paid_price = cf.NumericCustomField('', field_id=paid_price)
-        c_zdrav_id = cf.NumericCustomField('', field_id=zdrav_id)
+        c_zdrav_id = cf.TextCustomField('', field_id=zdrav_id)
 
         c_status = cf.TextCustomField('', field_id=status)
         c_check_in = cf.DateCustomField('', field_id=check_in)
@@ -65,7 +65,7 @@ def booked_lead_factory(
             self.price = booking.money.total
             self.c_created_at = booking.bookedAt
             self.c_paid_price = booking.money.paid
-            self.c_zdrav_id = booking.id
+            self.c_zdrav_id = str(booking.id)
 
             self.c_status = booking.status
             self.c_check_in = booking.checkin
