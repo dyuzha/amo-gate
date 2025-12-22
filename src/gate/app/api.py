@@ -8,12 +8,14 @@ logger = logging.getLogger(__name__)
 
 def app_register(
         incoming_booked: str,
-        incoming_mc: str
+        incoming_mc: str,
+        amo_client,
         ) -> FastAPI:
+
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        # startup (если понадобится)
+        app.state.task_queue.start_worker(amo_client)
         yield
         # shutdown
         logger.info("FastAPI shutdown: останавливаем task_queue")
@@ -22,10 +24,13 @@ def app_register(
         except Exception as e:
             logger.error(f"Ошибка при остановке воркера: {e}")
 
+
     app = FastAPI(
         title="Amo Gateway API",
         lifespan=lifespan,
     )
+
+
 
     @app.post(incoming_booked)
     async def booked(request: Request):

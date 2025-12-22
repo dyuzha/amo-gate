@@ -1,4 +1,4 @@
-import logging, sys, uvicorn, signal
+import logging, uvicorn
 from typing import Any
 from pathlib import Path
 from gate.amo.amo_register import amo_register
@@ -43,14 +43,13 @@ amo_client = amo_register(
 
 # Создаем очередь
 task_queue = TaskQueue()
-# запускаем воркер в отдельном потоке/процессе
-task_queue.start_worker(amo_client)
 
 
 # Запускаем API
 app = app_register(
         incoming_booked=app_settings.incoming_booked,
         incoming_mc=app_settings.incoming_mc,
+        amo_client=amo_client,
         )
 
 
