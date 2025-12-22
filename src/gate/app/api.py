@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import logging
 from fastapi import FastAPI, Request
 
@@ -10,7 +11,21 @@ def app_register(
         incoming_mc: str
         ) -> FastAPI:
 
-    app = FastAPI(title="Amo Gateway API")
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        # startup (если понадобится)
+        yield
+        # shutdown
+        logger.info("FastAPI shutdown: останавливаем task_queue")
+        try:
+            app.state.task_queue.stop_worker()
+        except Exception as e:
+            logger.error(f"Ошибка при остановке воркера: {e}")
+
+    app = FastAPI(
+        title="Amo Gateway API",
+        lifespan=lifespan,
+    )
 
     @app.post(incoming_booked)
     async def booked(request: Request):
