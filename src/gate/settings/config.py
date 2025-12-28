@@ -55,7 +55,7 @@ def register_settings(root_path: Path):
 
         created_at: int = 1287599
         paid_price: int = 1305167
-        zdrav_id: int = 1305111
+        zdrav_id: int = 1365121
 
 
     class BookedFieldMapping(ConfigBase):
@@ -69,11 +69,25 @@ def register_settings(root_path: Path):
         bill_data: int = 1304929
 
 
+    class MCFieldMapping(ConfigBase):
+        model_config = SettingsConfigDict(env_prefix='FIELD_MC_')
+
+        birthday: int = 1208395
+        treatments: int = 1363929
+        labs: int = 1363931
+        packets: int = 1363933
+        complex: int = 1363935
+
+    class FieldSettings:
+        shared = SharedFieldMapping()
+        booked = BookedFieldMapping()
+        mc = MCFieldMapping()
+
+
     class Settings:
         app = AppSettings()
         mock_pipeline = MockPipelineSettings()
         amo = AmoSettings() # type: ignore[call-arg]
-        booked_fields = BookedFieldMapping()
-        shared_fields = SharedFieldMapping()
+        fields = FieldSettings()
 
     return Settings

@@ -51,7 +51,7 @@ class ExtData(BaseModel):
         return ''
 
 
-class Booking(BaseModel):
+class Booked(BaseModel):
     status: Literal[
             "booked", "checkin", "checkout", "cancel", "waiting"
             ]

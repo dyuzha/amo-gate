@@ -18,12 +18,12 @@ class MockerLeadID:
             pipeline_id: Optional[int] = None,
             status_id: Optional[int] = None,
             lead_name_prefix: str = 'ID_',
-            name_mocker: str = 'Mocker'
+            name: str = 'Mocker'
             ):
         self.pipeline_id = pipeline_id
         self.status_id = status_id
         self.prefix = lead_name_prefix
-        self.logger = PrefixAdapter(base_logger, name_mocker)
+        self.logger = PrefixAdapter(base_logger, name)
         self.logger.info('Мокер успешно инициализирован.')
 
 

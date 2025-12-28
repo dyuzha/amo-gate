@@ -2,9 +2,9 @@ import logging
 from pathlib import Path
 import pytest
 from amocrm.v2 import tokens
-from gate.amo.amo_client import AmoClient
 from gate.amo.amo_register import amo_register
 from gate.settings.config import register_settings
+
 
 # Настройка логирования для всех тестов
 logging.basicConfig(
@@ -14,53 +14,43 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Определяем пути
-root_path = Path(__file__).parent.parent.parent
-tokens_path = root_path / ".tokens"
-tokens_path.parent.mkdir(exist_ok=True)
-
-settings = register_settings(root_path)
-
-amo_settings = settings.amo
-app_settings = settings.app
-mock_pipeline_settings = settings.mock_pipeline
-booked_fields=settings.booked_fields
-shared_fields=settings.shared_fields
+@pytest.fixture(scope="session")
+def root_path() -> Path:
+    return Path(__file__).parent.parent.parent
 
 
 @pytest.fixture(scope="session")
-def amo_settings_fixture():
-    """Загружает настройки AmoCRM для тестов."""
-    return amo_settings
+def test_data_path(root_path) -> Path:
+    return root_path / "src" / "tests" / "data"
 
 
 @pytest.fixture(scope="session")
-def token_manager():
-    """Инициализирует менеджер токенов AmoCRM."""
+def settings(root_path: Path):
+    """Загружает настройки AmoCRM"""
+    return register_settings(root_path)
+
+
+@pytest.fixture(scope="session")
+def token_manager(settings, root_path: Path):
+    """Инициализирует менеджер токенов AmoCRM"""
+    amo_settings = settings.amo_settings
     tokens.default_token_manager(
         client_id=amo_settings.client_id,
         client_secret=amo_settings.client_secret,
         subdomain=amo_settings.subdomain,
         redirect_url=amo_settings.redirect_url,
-        storage=tokens.FileTokensStorage(str(tokens_path)),
+        storage=tokens.FileTokensStorage(str(root_path / ".tokens")),
     )
     return tokens.default_token_manager
 
 
 @pytest.fixture(scope="session")
-def amo_client(token_manager, amo_settings_fixture):
+def amo_client(root_path: Path, settings):
     """Создаёт AmoClient с реальной авторизацией."""
-    # return AmoClient(
-    #         token_manager,
-    #         amo_settings_fixture.auth_code,
-    #         # booked_lead_cls=
-    #         )
     return amo_register(
-        tokens_path=tokens_path,
-        mocked_lead_id=False,
-        amo_settings=amo_settings,
-        shared_fields=shared_fields,
-        booked_fields=booked_fields,
-        booked_id=mock_pipeline_settings.booked_id,
-        booked_status_id=mock_pipeline_settings.booked_status_id,
+        tokens_path=root_path / ".tokens",
+        mocked_lead_id=True,
+        amo_settings=settings.amo,
+        fields_settings=settings.fields,
+        mock_pipeline_settings=settings.mock_pipeline,
         )

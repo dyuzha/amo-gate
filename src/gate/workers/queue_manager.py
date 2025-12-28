@@ -60,41 +60,43 @@ class TaskQueue:
 
             # Получаем задачу из очереди
             try:
-                data, send_method_name = self._queue.get(timeout=self.timeout)
+                data, pipeline_name = self._queue.get(timeout=self.timeout)
 
-                if data is None and send_method_name is None:
+                if data is None and pipeline_name is None:
                     logger.debug(
                             'Передан маркер "None, None", для остановки '
                             'менеджера очереди. Завершаем задачу...'
                             )
                     self._queue.task_done()
-                    logger.debug('Задача завершена.')
                     break
 
             except queue.Empty:
                 continue
 
             try:
-                succes = getattr(amo_client, send_method_name)(data)
+                succes = amo_client.load_pipeline_lead_data(data, pipeline_name)
 
                 if succes:
                     logger.info(
-                        f'Успешная выполнение задачи "{send_method_name}" '
-                        'из очереди'
-                        )
+                            'Успешная выполнение задачи для воронки: '
+                            f'"{pipeline_name}"'
+                            )
                 else:
                     logger.info(
-                        f'Выполнение задачи "{send_method_name}" завершено.'
+                        f'Выполнение задачи для воронки "{pipeline_name}" '
+                        'завершено.'
                         )
 
             except Exception as e:
                 logger.error(
-                        f'Ошибка выполнения задачи: "{send_method_name}": {e}',
+                        'Ошибка выполнения задачи для воронки '
+                        f'"{pipeline_name}": {e}',
                     exc_info=True
                 )
 
             finally:
                 self._queue.task_done()
+                logger.debug('Задача завершена.')
 
         logger.info('Поток менеджера очереди остановлен')
 

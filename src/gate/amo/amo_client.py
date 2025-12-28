@@ -1,81 +1,66 @@
 import logging
 from typing import Optional
 from amocrm.v2.tokens import TokenManager
-from amocrm.v2.exceptions import NoToken, NotFound
-from gate.amo.mocker_lead_id import MockerLeadID
-from gate.transform.booked_models import Booking
+from amocrm.v2.exceptions import NoToken
+from gate.amo.pipeline_manager import LeadNotFound, MockLeadException, PipelineManager, LeadIdKeyError
 
 
 logger = logging.getLogger(__name__)
 
-class AmoClient:
 
+class AmoClient:
     def __init__(
             self,
             manager: TokenManager,
             auth_code: Optional[str],
             *,
-            booked_lead_cls,
+            pipelines_data_map: dict[str, PipelineManager],
             mocked_lead_id: bool = False,
-            mocker: Optional[MockerLeadID] = None,
             ):
         self._ensure_initialized(manager, auth_code)
-        self.mocker = mocker
+        self.pl_data_map = pipelines_data_map
         self.mocked_lead_id = mocked_lead_id
-        self.BookedLead = booked_lead_cls
-
         if mocked_lead_id:
-            logger.info('Амо клиент запущен в режиме подмены lead_id.')
-            if mocker is None:
-                raise RuntimeError(
-                        "Mocker не передан! Режим подмены lead_id недоступен!"
-                        )
+            logger.info('AmoClient запущен в режиме подмены lead_id')
 
 
-    def update_booked_info(self, data: dict) -> bool:
+    def load_pipeline_lead_data(self, data: dict, pipeline_name: str):
+        """Загружает данные в воронку"""
+        pl = self.pl_data_map.get(pipeline_name)
+        if pl is None:
+            logger.error(
+                    f'Воронка {pipeline_name=} не найдена в {self.pl_data_map}'
+                    )
+            return False
+
         # Получаем lead_id
         lead_id = data.get('lead_id', None)
-
         if lead_id is None:
-            logger.warning(f'Данные не содержат lead_id! Данные: {data}')
+            logger.error(f'Поле lead_id не найдено в данных: {data}')
             return False
 
-        # Подменяем lead_id если включен режим подмены
-        if self.mocked_lead_id:
-            if self.mocker:
-                try:
-                    mock_lead_id = self.mocker.get_mock(lead_id)
-                    lead_id = mock_lead_id
-                except Exception as e:
-                    logger.warning(
-                        'При попытки получить mock лид для данных с '
-                        f'lead_id: "{lead_id}" произошла непредвиденная ошибка :{e}'
-                        )
-                    raise e
-
-        # Получаем lead_id
+        # Обновляем данные
         try:
-            lead = self.BookedLead.objects.get(object_id=lead_id)
-        except NotFound:
-            logger.warning(f'Лид с lead_id: {lead_id} не найден.')
+            pl.update_info(lead_id, data, self.mocked_lead_id)
+
+        except MockLeadException as e:
+            logger.error(str(e))
             return False
 
-        # Обновляем поля
-        try:
-            booking = Booking(**data)
-            lead.update_fields(booking)
-            lead.save()
-            logger.info(f'Данные для лида {lead.id=} успешно обновлены.')
-            return True
+        except LeadNotFound as e:
+            logger.warning(str(e))
+            return False
+
         except Exception as e:
             logger.warning(
-                    f'Не удалось обновить параметры лида с lead_id: {lead_id}'
+                    f'Не удалось обновить параметры лида с lead_id: {lead_id}',
+                    str(e)
                     )
             raise e
 
-    def update_mc_info(self, data):
-        # transformer.transform('mc', data)
-        pass
+        logger.info(f'Данные c {lead_id=} успешно загружены.')
+        return True
+
 
     def _ensure_initialized(
             self, manager: TokenManager, auth_code: str | None = None

@@ -37,13 +37,13 @@ def app_register(
         """Принимает webhook booked, кладет в очередь и возвращает 200 OK."""
 
         raw = await request.body()
-        logger.debug(f"Получен webhook: {raw.decode()}")
+        logger.debug(f"Получен booking webhook: {raw.decode()}")
 
         payload = await request.json()
 
         for j in payload:
             task_queue = request.app.state.task_queue
-            task_queue.put(j, "update_booked_info")
+            task_queue.put(j, "booked")
 
         return {"status": "ok"}
 
@@ -51,11 +51,16 @@ def app_register(
     @app.post(incoming_mc)
     async def mc(request: Request):
         """Принимает webhook mc, кладет в очередь и возвращает 200 OK."""
-        payload = await request.json()
-        task_queue = request.app.state.task_queue
-        task_queue.put(payload, "send_to_mc")
 
-        logger.info(f'Получен webhook: {payload}')
+        raw = await request.body()
+        logger.debug(f"Получен mc webhook: {raw.decode()}")
+
+        payload = await request.json()
+
+        for j in payload:
+            task_queue = request.app.state.task_queue
+            task_queue.put(j, "mc")
+
         return {"status": "ok"}
 
     logger.info('API успешно запущено.')
